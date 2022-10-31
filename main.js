@@ -78,30 +78,44 @@
                 window.enabled = void 0;
                 $(document).off("keydown");
                 $(document).on("keydown", ".geofs-stopKeyboardPropagation",
-                    function (e) {
+                    function(e) {
                         e.stopImmediatePropagation();
                     }
                 );
                 $(document).on("keydown", ".address-input",
-                    function (e) {
+                    function(e) {
                         e.stopImmediatePropagation();
                     }
                 );
+                controls.setters.reset = {
+                    label: "reset killer",
+                    set: function() {
+                        console.log("Blocked Reset");
+                    }
+                };
+
                 var e = controls.keyDown;
                 controls.keyDown = function (o) {
-                    if (rkEnabled) {
-                        if (typeof enabled != "undefined") {
-                            if (o.which == 82) {
-                                return;
+                    console.log(1);
+                    if(o.which == 82) {
+                        console.log(2);
+                        if (rkEnabled) {
+                            console.log(3);
+                            if (typeof enabled != "undefined") {
+                                enabled = !0;
+                                controls.setters.reset.set();
                             } else {
                                 e(o);
                             }
                         } else {
-                            e(o);
+                            geofs.resetFlight();
+                            console.log(4);
                         }
+                    } else {
+                        e(o);
                     }
-                    enabled = !0;
                 };
+                enabled = !0;
                 $(document).on("keydown", controls.keyDown);
             }
             adRemover.onclick = function() {
@@ -266,107 +280,82 @@
                     document.getElementById("counterKeys").innerHTML = "ENABLED";
                     countersEnabled = true;
                 }
-                var o = setInterval(function() {
-                    window.geofs &&
-                    geofs.aircraft &&
-                    geofs.aircraft.instance &&
-                    geofs.aircraft.instance.object3d &&
-                    (
-                        clearInterval(o),
-                        function() {
-                            window.enabled = void 0;
-            
-                            /*Makes sure you can't press shift + s in the chat and say flares.*/
-                            $(document).off("keydown");
-                            $(document).on("keydown", ".geofs-stopKeyboardPropagation",
-                                function(e) {
-                                    e.stopImmediatePropagation();
+
+                window.enabled = void 0;
+                $(document).off("keydown");
+                $(document).on("keydown", ".geofs-stopKeyboardPropagation",
+                    function(e) {
+                        e.stopImmediatePropagation();
+                    }
+                );
+                $(document).on("keydown", ".address-input",
+                    function(e) {
+                        e.stopImmediatePropagation();
+                    }
+                );
+
+                /*Flares*/
+                controls.setters.sayFlares = {
+                    label: "Say Flares",
+                    set: function() {
+                        multiplayer.chatMessage = "flares";
+                    }
+                };
+
+                /*Chaff*/
+                controls.setters.sayChaff = {
+                    label: "Say Chaff",
+                    set: function() {
+                        multiplayer.chatMessage = "chaff";
+                    }
+                };
+
+                /*Evade*/
+                controls.setters.sayEvade = {
+                    label: "Say Evade",
+                    set: function() {
+                        multiplayer.chatMessage = "evade";
+                    }
+                };
+                var e = controls.keyDown;
+                controls.keyDown = function(o) {
+                    if (countersEnabled) {
+                        if (typeof enabled != "undefined") {
+                            if (o.which == 50) {
+                                if (o.altKey) {
+                                    enabled = !0;
+                                    controls.setters.sayFlares.set();
+                                } else {
+                                    controls.throttle = (o.keyCode - 48) / 9;
+                                    enabled = !1;
                                 }
-                            );
-                            $(document).on("keydown", ".address-input",
-                                function(e) {
-                                    e.stopImmediatePropagation();
+                            } else if ("undefined" != typeof enabled && (o.which == 49 || o.which == 51)) {
+                                if (o.altKey) {
+                                    enabled = !0;
+                                    controls.setters.sayChaff.set();
+                                } else {
+                                    controls.throttle = (o.keyCode - 48) / 9;
+                                    enabled = !1;
                                 }
-                            );
-            
-                            /*Flares*/
-                            controls.sayFlares = !1;
-                            controls.setters.sayFlares = {
-                                label: "Say Flares",
-                                set: function() {
-                                    if (enabled) {
-                                        multiplayer.chatMessage = "flares";
-                                    }
+                            } else if ("undefined" != typeof enabled && o.which == 52) {
+                                if (o.altKey) {
+                                    enabled = !0;
+                                    controls.setters.sayEvade.set();
+                                } else {
+                                    controls.throttle = (o.keyCode - 48) / 9;
+                                    enabled = !1;
                                 }
-                            };
-            
-                            /*Chaff*/
-                            controls.sayChaff = !1;
-                            controls.setters.sayChaff = {
-                                label: "Say Chaff",
-                                set: function() {
-                                    if (enabled) {
-                                        multiplayer.chatMessage = "chaff";
-                                    }
-                                }
-                            };
-            
-                            /*Evade*/
-                            controls.sayEvade = !1;
-                            controls.setters.sayEvade = {
-                                label: "Say Evade",
-                                set: function() {
-                                    if (enabled) {
-                                        multiplayer.chatMessage = "evade";
-                                    }
-                                }
-                            };
-                            var e = controls.keyDown;
-                            controls.keyDown = function(o) {
-                                console.log(countersEnabled);
-                                if (countersEnabled) {
-                                    if (typeof enabled != "undefined") {
-                                        if (o.which == 50) {
-                                            if (o.altKey) {
-                                                enabled = !0;
-                                                controls.setters.sayFlares.set();
-                                            } else {
-                                                controls.throttle = (o.keyCode - 48) / 9;
-                                                enabled = !1;
-                                                controls.sayFlares = !1;
-                                            }
-                                        } else if ("undefined" != typeof enabled && (o.which == 49 || o.which == 51)) {
-                                            if (o.altKey) {
-                                                enabled = !0;
-                                                controls.setters.sayChaff.set();
-                                            } else {
-                                                controls.throttle = (o.keyCode - 48) / 9;
-                                                enabled = !1;
-                                                controls.sayChaff = !1;
-                                            }
-                                        } else if ("undefined" != typeof enabled && o.which == 52) {
-                                            if (o.altKey) {
-                                                enabled = !0;
-                                                controls.setters.sayEvade.set();
-                                            } else {
-                                                controls.throttle = (o.keyCode - 48) / 9;
-                                                enabled = !1;
-                                                controls.sayEvade = !1;
-                                            }
-                                        } else {
-                                            e(o);
-                                        }
-                                    } else {
-                                        e(o);
-                                    }
-                                }
-                            };
-                            /*used to be if statement for the instruments. May need to put back.*/
-                            enabled = !0;
-                            $(document).on("keydown", controls.keyDown);
-                        }()
-                        );
-                }, 100);
+                            } else {
+                                e(o);
+                            }
+                        } else {
+                            e(o);
+                        }
+                    }
+                }
+                
+                enabled = !0;
+                $(document).on("keydown", controls.keyDown);
                 $("#flares").click(function(){
                     multiplayer.chatMessage = "flares";
                 });
@@ -376,7 +365,6 @@
                 $("#evade").click(function(){
                     multiplayer.chatMessage = "evade";
                 });
-
             });
             $("#haul").on("click", function(){
                 geofs.aircraft.instance.setup.maxRPM = 1000000;
