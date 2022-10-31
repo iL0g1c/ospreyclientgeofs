@@ -259,9 +259,11 @@
             $("#counterKeys").on("click", function() {
                 if (countersEnabled) {
                     document.getElementById("counterKeys").style.backgroundColor = red;
+                    document.getElementById("counterKeys").innerHTML = "DISABLED";
                     countersEnabled = false;
                 } else {
                     document.getElementById("counterKeys").style.backgroundColor = green;
+                    document.getElementById("counterKeys").innerHTML = "ENABLED";
                     countersEnabled = true;
                 }
                 var o = setInterval(function() {
@@ -286,7 +288,8 @@
                                     e.stopImmediatePropagation();
                                 }
                             );
-                            /*Flare*/
+            
+                            /*Flares*/
                             controls.sayFlares = !1;
                             controls.setters.sayFlares = {
                                 label: "Say Flares",
@@ -319,8 +322,9 @@
                                 }
                             };
                             var e = controls.keyDown;
-                            if (countersEnabled) {
-                                controls.keyDown = function(o) {
+                            controls.keyDown = function(o) {
+                                console.log(countersEnabled);
+                                if (countersEnabled) {
                                     if (typeof enabled != "undefined") {
                                         if (o.which == 50) {
                                             if (o.altKey) {
@@ -355,32 +359,28 @@
                                     } else {
                                         e(o);
                                     }
-                                };
-                                enabled = !0;
-                                $(document).on("keydown", controls.keyDown);
-                            }
-                            
-                        });
-                        $("#flares").click(function(){
-                            multiplayer.chatMessage = "flares";
-                        });
-                        $("#chaff").click(function(){
-                            multiplayer.chatMessage = "chaff";
-                        });
-                        $("#evade").click(function(){
-                            multiplayer.chatMessage = "evade";
-                        });
+                                }
+                            };
+                            /*used to be if statement for the instruments. May need to put back.*/
+                            enabled = !0;
+                            $(document).on("keydown", controls.keyDown);
+                        }()
+                        );
                 }, 100);
-                if (countersEnabled) {
-                    document.getElementById("counterKeys").innerHTML = "ENABLED";
-                } else {
-                    document.getElementById("counterKeys").innerHTML = "DISABLED";
-                }
-    
+                $("#flares").click(function(){
+                    multiplayer.chatMessage = "flares";
+                });
+                $("#chaff").click(function(){
+                    multiplayer.chatMessage = "chaff";
+                });
+                $("#evade").click(function(){
+                    multiplayer.chatMessage = "evade";
+                });
+
             });
             $("#haul").on("click", function(){
                 geofs.aircraft.instance.setup.maxRPM = 1000000;
-            })
+            });
         }
         inject();
     } 
