@@ -11,11 +11,17 @@
 // ==/UserScript==
 (function() {
     'use strict';
+    let red = "#FF0000";
+    let green = "#00FF00";
+
+    //loads jsframe
     let a = document.createElement("script");
     a.src = "https://riversun.github.io/jsframe/jsframe.js";
     document.head.appendChild(a);
+
     window.onload = function() {
-        function loadMain() {
+        function inject() {
+            //creates starting window.
             const jsFrame = new JSFrame();
             const mainFrame = jsFrame.create({
                 title: 'Osprey Client',
@@ -29,32 +35,44 @@
                 <div class='geofs-stopKeyboardPropagation' id="winmain" style="z-index: 201;">
                     <button id="flightmod" style="border-radius: 0; border-width: 1px; height: 24px; margin-left: 0px;">Flight Module</button>
                     <br>
-                    <button id="removeAds" style="border-radius:0; border-width: 1px; height: 24px; margin-left: 0px;">Ad Remover</button>
-                    <br>
                     <button id="combat" style="border-radius:0; border-width: 1px; height: 24px; margin-left: 0px;">Combat Module</button>
                     <br>
                     <br>
                     <p style="margin: 0px">Reset Remover</p>
-                    <button id="rdisable" style="border-radius:0; border-width: 1px; height: 24px; margin-left: 0px;">DISABLED</button>
+                    <button id="rdisable" style="border-radius:0; border-width: 1px; height: 24px; margin-left: 0px; backgroundColor=green">DISABLED</button>
+                    <br>
+                    <br>
+                    <p style="margin: 0px">Ad Remover</p>
+                    <button id="removeAds" style="border-radius:0; border-width: 1px; height: 24px; margin-left: 0px;">INJECT</button>
                 </div>`
             });
+    
+            //displays it
+            mainFrame.setName("Main Frame");
             mainFrame.show();
             mainFrame.htmlElement.parentElement.parentElement.style.zIndex = "202";
-
+    
+            //loads window elements
+            document.getElementById("rdisable").style.backgroundColor = red;
+            document.getElementById("removeAds").style.backgroundColor = red;
             let flightmod = document.getElementById("flightmod");
             let resetKiller = document.getElementById("rdisable");
             let adRemover = document.getElementById("removeAds");
             let combat = document.getElementById("combat");
             let rkEnabled = false;
-            flightmod.onclick = function () {
-                loadflightmod();
+    
+            //Programs all buttons with click results
+            flightmod.onclick = function() {
+                loadFlightMod();
             }
             resetKiller.onclick = function() {
                 if (rkEnabled) {
-                    document.getElementById("rdisable").innerHTML = "ENABLED";
+                    document.getElementById("rdisable").style.backgroundColor = red;
+                    document.getElementById("rdisable").innerHTML = "DISABLED";
                     rkEnabled = false;
                 } else {
-                    document.getElementById("rdisable").innerHTML = "DISABLED";
+                    document.getElementById("rdisable").style.backgroundColor = green;
+                    document.getElementById("rdisable").innerHTML = "ENABLED";
                     rkEnabled = true;
                 }
                 window.enabled = void 0;
@@ -87,16 +105,17 @@
                 $(document).on("keydown", controls.keyDown);
             }
             adRemover.onclick = function() {
+                document.getElementById("removeAds").style.backgroundColor = green;
                 document.querySelector("body > div.geofs-adbanner.geofs-adsense-container").parentElement.removeChild(document.querySelector("body > div.geofs-adbanner.geofs-adsense-container"));
-                document.getElementById("removeAds").innerHTML = "Ad Remover (REMOVED)";
+                document.getElementById("removeAds").innerHTML = "REMOVED";
             }
             combat.onclick = function() {
-                console.log("hello world");
                 loadCombatMod();
-            }
-
+            };
+    
         }
-        function loadflightmod() {
+        function loadFlightMod() {
+            //Loads new window for flight module.
             const jsFrame = new JSFrame();
             const flightmodFrame = jsFrame.create({
                 title: 'Flight Module',
@@ -114,13 +133,27 @@
                         <br></br>
                         <p style="margin: 0px">Flight Ceiling (feet)</p>
                         <input id='ceiling' type='text' value=0>
+                        <br>
+                        <br>
+                        <p style="margin: 0px">Stealth</p>
+                        <button id="stealth" style="border-radius:0; border-width: 1px; height: 24px; margin-left: 0px;">DISABLED</button>
                     </div>`
             });
+            document.getElementById("stealth").style.backgroundColor = red;
             document.getElementById('ceiling').value = geofs.aircraft.instance.setup.zeroThrustAltitude;
             flightmodFrame.show();
             flightmodFrame.htmlElement.parentElement.parentElement.style.zIndex = "203";
+            let stealthEnabled = false;
             let speed
             let maxRPM = geofs.aircraft.instance.setup.maxRPM;
+            let desiredPos = [52.8456078, -.5376166, 179.02169805221382],
+                    disguisePos = !1,
+                    desiredPlaneId = 4,
+                    disguisePlane = !1,
+                    desiredGroundContact = !0,
+                    disguiseGroundContact = !1,
+                    desiredAirSpeed = 0,
+                    disguiseAirSpeed = !1;
             $("#speedSlider").on("change", function(){
                 speed = document.getElementById("speedSlider").value;
                 document.getElementById("speedBox").value = speed;
@@ -139,6 +172,56 @@
                     console.log(geofs.aircraft.instance.setup.zeroThrustAltitude);
                 }
             })
+            $('#stealth').on("click", function() {
+                //AutoStealthMode %cDeveloped by %cS.H.I.E.L.D. Research & Development
+                if (stealthEnabled) {
+                    document.getElementById("stealth").style.backgroundColor = red;
+                    disguisePos = !1, disguisePlane = !1, disguiseGroundContact = !1, disguiseAirSpeed = !1;
+                    stealthEnabled = false;
+                    document.getElementById('stealth').innerHTML = "DISABLED";
+                } else {
+                    document.getElementById("stealth").style.backgroundColor = green;
+                    disguisePos = !0, disguisePlane = !0, disguiseGroundContact = !0, disguiseAirSpeed = !0
+                    stealthEnabled = true;
+                    document.getElementById('stealth').innerHTML = "ENABLED";
+                }
+                multiplayer.sendUpdate = function() {
+                    try {
+                        if (!multiplayer.lastRequest && !flight.recorder.playing) {
+                            var e = geofs.aircraft.instance,
+                                i = Date.now();
+                            let l, d, n;
+                            multiplayer.lastRequestTime = i, l = disguisePos ? desiredPos : e.llaLocation, d = disguiseGroundContact ? desiredGroundContact : e.groundContact, n = disguiseAirSpeed ? Math.round(desiredAirSpeed) : Math.round(geofs.animation.values.kias);
+                            var t = $.merge($.merge([], l), e.htr),
+                                r = V3.scale(xyz2lla(e.rigidBody.getLinearVelocity(), l), .001),
+                                s = $.merge(r, e.htrAngularSpeed),
+                                a = {
+                                    gr: d,
+                                    as: n
+                                };
+                            let c;
+                            e.liveryId && (a.lv = e.liveryId), c = disguisePlane ? desiredPlaneId : e.aircraftRecord.id;
+                            var o = {
+                                acid: geofs.userRecord.id,
+                                sid: geofs.userRecord.sessionId,
+                                id: multiplayer.myId,
+                                ac: c,
+                                co: t,
+                                ve: s,
+                                st: a,
+                                ti: multiplayer.getServerTime(),
+                                m: multiplayer.chatMessage,
+                                ci: multiplayer.chatMessageId
+                            };
+                            multiplayer.flightSharing.status && multiplayer.flightSharing.peer && (o.st.sh = {
+                                pe: multiplayer.flightSharing.peer.acid
+                            }, multiplayer.flightSharing.control && (o.st.sh.ct = [controls.rawPitch, controls.roll, controls.yaw, controls.throttle, controls.gear.position, controls.flaps.position, controls.airbrakes.position], o.st.sh.ve = geofs.aircraft.instance.rigidBody.getLinearVelocity().concat(geofs.aircraft.instance.rigidBody.getAngularVelocity()), o.st.sh.st = [geofs.aircraft.instance.engine.on])), multiplayer.chatMessage = "", multiplayer.lastRequest = geofs.ajax.post(geofs.multiplayerHost + "/update", o, multiplayer.updateCallback, multiplayer.errorCallback)
+                        }
+                    } catch (e) {
+                        geofs.debug.error(e, "multiplayer.sendUpdate")
+                    }
+                }
+            });
         }
         function loadCombatMod() {
             const jsFrame = new JSFrame();
@@ -154,23 +237,32 @@
                     <div class='geofs-stopKeyboardPropagation'>
                         <p style="margin: 0px">Inject Counter Keys</p>
                         <button id="counterKeys" style="border-radius:0; border-width: 1px; height: 24px; margin-left: 0px;">DISABLED</button>
-                        <br></br>
+                        <br>
+                        <br>
+                        <p style="margin: 0px">Countermeasure GUI</p>
                         <button id="flares" style="border-radius:0; border-width: 1px; height: 24px; margin-left: 0px;">FLARES</button>
                         <button id="chaffs" style="border-radius:0; border-width: 1px; height: 24px; margin-left: 0px;">CHAFFS</button>
                         <button id="evade" style="border-radius:0; border-width: 1px; height: 24px; margin-left: 0px;">EVADE</button>
+                        <br>
+                        <br>
+                        <p style="margin: 0px">Panic Buttons</p>
+                        <button id="haul" style="border-radius:0; border-width: 1px; height: 24px; margin-left: 0px;">HAUL A**</button>
+    
                     </div>
                 `
             });
+            document.getElementById("counterKeys").style.backgroundColor = red;
+            document.getElementById("haul").style.backgroundColor = red;
             combatmodFrame.show();
             combatmodFrame.htmlElement.parentElement.parentElement.style.zIndex = "204";
             let countersEnabled = false;
             $("#counterKeys").on("click", function() {
                 if (countersEnabled) {
+                    document.getElementById("counterKeys").style.backgroundColor = red;
                     countersEnabled = false;
-                    console.log("off");
                 } else {
+                    document.getElementById("counterKeys").style.backgroundColor = green;
                     countersEnabled = true;
-                    console.log("on")
                 }
                 var o = setInterval(function() {
                     window.geofs &&
@@ -284,9 +376,12 @@
                 } else {
                     document.getElementById("counterKeys").innerHTML = "DISABLED";
                 }
-
+    
+            });
+            $("#haul").on("click", function(){
+                geofs.aircraft.instance.setup.maxRPM = 1000000;
             })
         }
-        loadMain();
-    }
+        inject();
+    } 
 })();
