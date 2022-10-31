@@ -45,7 +45,6 @@
         } catch (e) {
             console.log("Error 1");
         }
-        console.log("hello");
         setTimeout(function() {
 
             // AutoPatrol

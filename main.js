@@ -27,20 +27,67 @@
                 resizeable: true,
                 html: `
                 <div class='geofs-stopKeyboardPropagation' id="winmain" style="z-index: 201;">
-                    <button id="entityspeed" style="border-radius: 0; border-width: 1px; height: 24px; margin-left: 0px;">Speed</button>
+                    <button id="flightmod" style="border-radius: 0; border-width: 1px; height: 24px; margin-left: 0px;">Flight Module</button>
+                    <button id="rdisable" style="border-radius:0; border-width: 1px; height: 24px; margin-left: 0px;">Reset Remover (DISABLED)</button>
+                    <button id="removeAds" style="border-radius:0; border-width: 1px; height: 24px; margin-left: 0px;">Ad Remover</button>
+                    <button id="combat" style="border-radius:0; border-width: 1px; height: 24px; margin-left: 0px;">Combat Module</button>
                 </div>`
             });
             mainFrame.show();
             mainFrame.htmlElement.parentElement.parentElement.style.zIndex = "202";
 
-            let entitySpeed = document.getElementById("entityspeed");
-            entitySpeed.onclick = function () {
-                loadEntitySpeed();
+            let flightmod = document.getElementById("flightmod");
+            let resetKiller = document.getElementById("rdisable");
+            let adRemover = document.getElementById("removeAds");
+            let combat = document.getElementById("combat");
+            let rkEnabled = false;
+            flightmod.onclick = function () {
+                loadflightmod();
             }
+            resetKiller.onclick = function() {
+                if (!rkEnabled) {
+                    document.getElementById("rdisable").innerHTML = "Reset Remover (LOCKED)";
+                    window.enabled = void 0;
+                    $(document).off("keydown");
+                    $(document).on("keydown", ".geofs-stopKeyboardPropagation",
+                        function (e) {
+                            e.stopImmediatePropagation();
+                        }
+                    );
+                    $(document).on("keydown", ".address-input",
+                        function (e) {
+                            e.stopImmediatePropagation();
+                        }
+                    );
+                    var e = controls.keyDown;
+                    controls.keyDown = function (o) {
+                        if (typeof enabled != "undefined") {
+                            if (o.which == 82) {
+                                return;
+                            } else {
+                                e(o);
+                            }
+                        } else {
+                            e(o);
+                        }
+    
+                    };
+                    enabled = !0;
+                    $(document).on("keydown", controls.keyDown);
+                }
+            }
+            adRemover.onclick = function() {
+                document.querySelector("body > div.geofs-adbanner.geofs-adsense-container").parentElement.removeChild(document.querySelector("body > div.geofs-adbanner.geofs-adsense-container"));
+                document.getElementById("removeAds").innerHTML = "Ad Remover (REMOVED)";
+            }
+            combat.onclick = function() {
+                loadCombatMod();
+            }
+
         }
-        function loadEntitySpeed() {
+        function loadflightmod() {
             const jsFrame = new JSFrame();
-            const entitySpeedFrame = jsFrame.create({
+            const flightmodFrame = jsFrame.create({
                 title: 'entity speed',
                 parentElement: document.body,
                 left: 0,
@@ -50,13 +97,17 @@
                 resizeable: true,
                 html: `
                     <div class='geofs-stopKeyboardPropagation'>
-                    <p style="margin: 0px">Max RPM (% of normal)</p>
-                    <input id='speedBox' type='text' value='100'>
-                    <input id='speedSlider' type='range' min='0' max='1000' value='100' step='10'>
-                </div>`
+                        <p style="margin: 0px">Max RPM (% of normal)</p>
+                        <input id='speedBox' type='text' value='100'>
+                        <input id='speedSlider' type='range' min='0' max='1000' value='100' step='10'>
+                        <br></br>
+                        <p style="margin: 0px">Flight Ceiling (feet)</p>
+                        <input id='ceiling' type='text' value=0>
+                    </div>`
             });
-            entitySpeedFrame.show();
-            entitySpeedFrame.htmlElement.parentElement.parentElement.style.zIndex = "203";
+            document.getElementById('ceiling').value = geofs.aircraft.instance.setup.zeroThrustAltitude;
+            flightmodFrame.show();
+            flightmodFrame.htmlElement.parentElement.parentElement.style.zIndex = "203";
             let speed
             let maxRPM = geofs.aircraft.instance.setup.maxRPM;
             $("#speedSlider").on("change", function(){
@@ -71,6 +122,15 @@
                     geofs.aircraft.instance.setup.maxRPM = maxRPM * speed/100;
                 }
             });
+            $('#ceiling').on("keypress", function(e) {
+                if(e.which == 13) {
+                    geofs.aircraft.instance.setup.zeroThrustAltitude = parseInt(document.getElementById('ceiling').value);
+                    console.log(geofs.aircraft.instance.setup.zeroThrustAltitude);
+                }
+            })
+        }
+        function loadCombatMod() {
+            
         }
         loadMain();
     }
