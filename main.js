@@ -37,6 +37,8 @@
                     <br>
                     <button id="combat" style="border-radius:0; border-width: 1px; height: 24px; margin-left: 0px;">Combat Module</button>
                     <br>
+                    <button id="mechmod" style="border-radius:0; border-width: 1px; height: 24px; margin-left: 0px;">Mechanics Module</button>
+                    <br>
                     <br>
                     <p style="margin: 0px">Reset Remover</p>
                     <button id="rdisable" style="border-radius:0; border-width: 1px; height: 24px; margin-left: 0px; backgroundColor=green">DISABLED</button>
@@ -59,6 +61,7 @@
             let resetKiller = document.getElementById("rdisable");
             let adRemover = document.getElementById("removeAds");
             let combat = document.getElementById("combat");
+            let mechmod = document.getElementById("mechmod");
             let rkEnabled = false;
     
             //Programs all buttons with click results
@@ -96,11 +99,8 @@
 
                 var e = controls.keyDown;
                 controls.keyDown = function (o) {
-                    console.log(1);
                     if(o.which == 82) {
-                        console.log(2);
                         if (rkEnabled) {
-                            console.log(3);
                             if (typeof enabled != "undefined") {
                                 enabled = !0;
                                 controls.setters.reset.set();
@@ -109,7 +109,6 @@
                             }
                         } else {
                             geofs.resetFlight();
-                            console.log(4);
                         }
                     } else {
                         e(o);
@@ -126,6 +125,9 @@
             combat.onclick = function() {
                 loadCombatMod();
             };
+            mechmod.onclick = function() {
+                mechMod();
+            }
     
         }
         function loadFlightMod() {
@@ -183,11 +185,10 @@
             $('#ceiling').on("keypress", function(e) {
                 if(e.which == 13) {
                     geofs.aircraft.instance.setup.zeroThrustAltitude = parseInt(document.getElementById('ceiling').value);
-                    console.log(geofs.aircraft.instance.setup.zeroThrustAltitude);
                 }
             })
             $('#stealth').on("click", function() {
-                //AutoStealthMode %cDeveloped by %cS.H.I.E.L.D. Research & Development
+                //AutoStealthMode Developed by S.H.I.E.L.D. Research & Development
                 if (stealthEnabled) {
                     document.getElementById("stealth").style.backgroundColor = red;
                     disguisePos = !1, disguisePlane = !1, disguiseGroundContact = !1, disguiseAirSpeed = !1;
@@ -368,6 +369,46 @@
             });
             $("#haul").on("click", function(){
                 geofs.aircraft.instance.setup.maxRPM = 1000000;
+            });
+        }
+        function mechMod() {
+            const jsFrame = new JSFrame();
+            const mechModFrame = jsFrame.create({
+                title: 'Mechanical Module',
+                parentElement: document.body,
+                left: 0,
+                height: 375,
+                width: 203,
+                movable: true,
+                resizeable: true,
+                html: `
+                    <div class='geofs-stopKeyboardPropagation'>
+                        <p style="margin: 0px">InstaGear</p>
+                        <button id="instagear" style="border-radius:0; border-width: 1px; height: 24px; margin-left: 0px;">DISABLED</button>
+                        
+                    </div>
+                `
+            });
+            document.getElementById("instagear").style.backgroundColor = red;
+            mechModFrame.show();
+            mechModFrame.htmlElement.parentElement.parentElement.style.zIndex = "205";
+            
+            let gearEnabled = true;
+            $("#instagear").on("click", function() {
+                if (gearEnabled) {
+                    const gearTravelTime = geofs.aircraft.instance.setup.gearTravelTime;
+                    gearEnabled = false;
+                    document.getElementById("instagear").style.backgroundColor = red;
+                    document.getElementById("instagear").innerHTML = "DISABLED";
+                    geofs.aircraft.instance.setup.gearTravelTime = .000000001;
+                } else {
+                    geofs.aircraft.instance.setup.gearTravelTime = gearTravelTime;
+                    gearEnabled = true;
+                    document.getElementById("instagear").style.backgroundColor = green;
+                    document.getElementById("instagear").innerHTML = "ENABLED";
+                }
+
+
             });
         }
         inject();
