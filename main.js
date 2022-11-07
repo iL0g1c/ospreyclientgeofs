@@ -16,7 +16,8 @@
 
     //loads jsframe
     let a = document.createElement("script");
-    a.src = "https://riversun.github.io/jsframe/jsframe.js";
+    a.src = "https://cdn.jsdelivr.net/npm/jsframe.js/lib/jsframe.min.js";
+    //a.src = "https://riversun.github.io/jsframe/jsframe.js";
     document.head.appendChild(a);
 
     window.onload = function() {
@@ -126,7 +127,7 @@
                 loadCombatMod();
             };
             mechmod.onclick = function() {
-                mechMod();
+                loadMechMod();
             }
     
         }
@@ -371,7 +372,7 @@
                 geofs.aircraft.instance.setup.maxRPM = 1000000;
             });
         }
-        function mechMod() {
+        function loadMechMod() {
             const jsFrame = new JSFrame();
             const mechModFrame = jsFrame.create({
                 title: 'Mechanical Module',
@@ -385,31 +386,54 @@
                     <div class='geofs-stopKeyboardPropagation'>
                         <p style="margin: 0px">InstaGear</p>
                         <button id="instagear" style="border-radius:0; border-width: 1px; height: 24px; margin-left: 0px;">DISABLED</button>
+                        <br>
+                        <br>
+                        <p style="margin: 0px">InstaFlaps</p>
+                        <button id="instaflaps" style="border-radius:0; border-width: 1px; height: 24px; margin-left: 0px;">DISABLED</button>
                         
                     </div>
                 `
             });
             document.getElementById("instagear").style.backgroundColor = red;
+            document.getElementById("instaflaps").style.backgroundColor = red;
             mechModFrame.show();
             mechModFrame.htmlElement.parentElement.parentElement.style.zIndex = "205";
             
-            let gearEnabled = true;
+            let gearEnabled = false;
+            let gearTravelTime = geofs.aircraft.instance.setup.gearTravelTime;
             $("#instagear").on("click", function() {
                 if (gearEnabled) {
-                    const gearTravelTime = geofs.aircraft.instance.setup.gearTravelTime;
+                    geofs.aircraft.instance.setup.gearTravelTime = gearTravelTime;
                     gearEnabled = false;
                     document.getElementById("instagear").style.backgroundColor = red;
                     document.getElementById("instagear").innerHTML = "DISABLED";
-                    geofs.aircraft.instance.setup.gearTravelTime = .000000001;
                 } else {
-                    geofs.aircraft.instance.setup.gearTravelTime = gearTravelTime;
+                    gearTravelTime = geofs.aircraft.instance.setup.gearTravelTime;
                     gearEnabled = true;
                     document.getElementById("instagear").style.backgroundColor = green;
                     document.getElementById("instagear").innerHTML = "ENABLED";
+                    geofs.aircraft.instance.setup.gearTravelTime = .000000001;
                 }
 
 
             });
+
+            let flapsEnabled = false;
+            let flapsTravelTime = geofs.aircraft.instance.setup.flapsTravelTime;
+            $("#instaflaps").on("click", function() {
+                if (flapsEnabled) {
+                    geofs.aircraft.instance.setup.flapsTravelTime = flapsTravelTime;
+                    flapsEnabled = false;
+                    document.getElementById("instaflaps").style.backgroundColor = red;
+                    document.getElementById("instaflaps").innerHTML = "DISABLED";
+                } else {
+                    flapsTravelTime = geofs.aircraft.instance.setup.flapsTravelTime;
+                    flapsEnabled = true;
+                    document.getElementById("instaflaps").style.backgroundColor = green;
+                    document.getElementById("instaflaps").innerHTML = "ENABLED";
+                    geofs.aircraft.instance.setup.flapsTravelTime = .000000001;
+                }
+            })
         }
         inject();
     } 
