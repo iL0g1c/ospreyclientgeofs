@@ -23,4 +23,31 @@ This hack was produced by Fury.
 Normally, you client shares your statistics like position to the server. This hack disables that feature, so when the server does not recieve your position from the client,
 it doesn't display you on other peoples nav screens. This hack is FRP, since people will assume you logged off or tped.
 
+##Combat Module
+###Counter Keys Injection
+This hack allows you to use key commands to automatically type counters in chat for MRP.
+Enable/Disable this by clicking the button.
+The key commands for each counter are alt+[fox code].
+For example:
+alt+1 = chaff
+alt+4 = evade
+This hack is FRP, as the current UN MRP administration, does not allow semi-automatic countermeasures.
+
+###Countermeasure GUI
+This is a clickabble GUI that you can use instead of key commands. I would not recommend this.
+Once again, this is FRP.
+
+###Panic Button (Haul Ass)
+This hack is a quick button to increase your RPMs to an extreme level. This can theoretically be used to get out of a combat situation quickly.
+This hack is FRP seeing that modifing your planes stats is FRP.
+
+##Mechanical Module
+###InstaGear
+This hack allows you to extend your gear instantly.
+As of November 7th 2022, the UN has not issued a statement on this hack. Use with caution.
+
+###InstaFlaps
+This hack allows you to extend your flaps instantly.
+As of November 7th 2022, the UN has not issued a statement on this hack. Use with caution.
+
 #Known Issues
