@@ -63,3 +63,5 @@ This hack allows you to extend your flaps instantly.
 As of November 7th 2022, the UN has not issued a statement on this hack. Use with caution.
 
 # Known Issues
+1. Speed hacks do not work in 3.3.
+2. If hacks that modify an aircraft are enabled, you will need reload the page after you switch aircraft.
