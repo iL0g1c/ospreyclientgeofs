@@ -1,15 +1,15 @@
 // ==UserScript==
 // @name         OspreyClient
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      0.2a
 // @description  The one and only hacked client for GeoFS
 // @author       Osprey
-// @match        https://www.geo-fs.com/geofs.php?v=3.3
+// @match        https://www.geo-fs.com/geofs.php?v=3.5
 // @match        https://legacy.geo-fs.com/geofs.php
 // @icon         https://www.google.com/s2/favicons?domain=geo-fs.com
 // @grant        none
 // ==/UserScript==
-(function() {
+(function () {
     'use strict';
     let red = "#FF0000";
     let green = "#00FF00";
@@ -20,7 +20,7 @@
     //a.src = "https://riversun.github.io/jsframe/jsframe.js";
     document.head.appendChild(a);
 
-    window.onload = function() {
+    window.onload = function () {
         function inject() {
             //creates starting window.
             const jsFrame = new JSFrame();
@@ -49,12 +49,12 @@
                     <button id="removeAds" style="border-radius:0; border-width: 1px; height: 24px; margin-left: 0px;">INJECT</button>
                 </div>`
             });
-    
+
             //displays it
             mainFrame.setName("Main Frame");
             mainFrame.show();
             mainFrame.htmlElement.parentElement.parentElement.style.zIndex = "202";
-    
+
             //loads window elements
             document.getElementById("rdisable").style.backgroundColor = red;
             document.getElementById("removeAds").style.backgroundColor = red;
@@ -64,12 +64,12 @@
             let combat = document.getElementById("combat");
             let mechmod = document.getElementById("mechmod");
             let rkEnabled = false;
-    
+
             //Programs all buttons with click results
-            flightmod.onclick = function() {
+            flightmod.onclick = function () {
                 loadFlightMod();
             }
-            resetKiller.onclick = function() {
+            resetKiller.onclick = function () {
                 if (rkEnabled) {
                     document.getElementById("rdisable").style.backgroundColor = red;
                     document.getElementById("rdisable").innerHTML = "DISABLED";
@@ -82,25 +82,25 @@
                 window.enabled = void 0;
                 $(document).off("keydown");
                 $(document).on("keydown", ".geofs-stopKeyboardPropagation",
-                    function(e) {
+                    function (e) {
                         e.stopImmediatePropagation();
                     }
                 );
                 $(document).on("keydown", ".address-input",
-                    function(e) {
+                    function (e) {
                         e.stopImmediatePropagation();
                     }
                 );
                 controls.setters.reset = {
                     label: "reset killer",
-                    set: function() {
+                    set: function () {
                         console.log("Blocked Reset");
                     }
                 };
 
                 var e = controls.keyDown;
                 controls.keyDown = function (o) {
-                    if(o.which == 82) {
+                    if (o.which == 82) {
                         if (rkEnabled) {
                             if (typeof enabled != "undefined") {
                                 enabled = !0;
@@ -118,18 +118,18 @@
                 enabled = !0;
                 $(document).on("keydown", controls.keyDown);
             }
-            adRemover.onclick = function() {
+            adRemover.onclick = function () {
                 document.getElementById("removeAds").style.backgroundColor = green;
                 document.querySelector("body > div.geofs-adbanner.geofs-adsense-container").parentElement.removeChild(document.querySelector("body > div.geofs-adbanner.geofs-adsense-container"));
                 document.getElementById("removeAds").innerHTML = "REMOVED";
             }
-            combat.onclick = function() {
+            combat.onclick = function () {
                 loadCombatMod();
             };
-            mechmod.onclick = function() {
+            mechmod.onclick = function () {
                 loadMechMod();
             }
-    
+
         }
         function loadFlightMod() {
             //Loads new window for flight module.
@@ -157,38 +157,38 @@
                     </div>`
             });
             document.getElementById("stealth").style.backgroundColor = red;
-            document.getElementById('ceiling').value = geofs.aircraft.instance.setup.zeroThrustAltitude;
+            document.getElementById('ceiling').value = geofs.aircraft.instance.definition.zeroThrustAltitude;
             flightmodFrame.show();
             flightmodFrame.htmlElement.parentElement.parentElement.style.zIndex = "203";
             let stealthEnabled = false;
             let speed
-            let maxRPM = geofs.aircraft.instance.setup.maxRPM;
+            let maxRPM = geofs.aircraft.instance.definition.maxRPM;
             let desiredPos = [52.8456078, -.5376166, 179.02169805221382],
-                    disguisePos = !1,
-                    desiredPlaneId = 4,
-                    disguisePlane = !1,
-                    desiredGroundContact = !0,
-                    disguiseGroundContact = !1,
-                    desiredAirSpeed = 0,
-                    disguiseAirSpeed = !1;
-            $("#speedSlider").on("change", function(){
+                disguisePos = !1,
+                desiredPlaneId = 4,
+                disguisePlane = !1,
+                desiredGroundContact = !0,
+                disguiseGroundContact = !1,
+                desiredAirSpeed = 0,
+                disguiseAirSpeed = !1;
+            $("#speedSlider").on("change", function () {
                 speed = document.getElementById("speedSlider").value;
                 document.getElementById("speedBox").value = speed;
-                geofs.aircraft.instance.setup.maxRPM = maxRPM * speed/100;
+                geofs.aircraft.instance.definition.maxRPM = maxRPM * speed / 100;
             });
-            $('#speedBox').on("keypress", function(e){
-                if(e.which == 13){
+            $('#speedBox').on("keypress", function (e) {
+                if (e.which == 13) {
                     speed = document.getElementById("speedBox").value;
                     document.getElementById("speedSlider").value = speed;
-                    geofs.aircraft.instance.setup.maxRPM = maxRPM * speed/100;
+                    geofs.aircraft.instance.definition.maxRPM = maxRPM * speed / 100;
                 }
             });
-            $('#ceiling').on("keypress", function(e) {
-                if(e.which == 13) {
-                    geofs.aircraft.instance.setup.zeroThrustAltitude = parseInt(document.getElementById('ceiling').value);
+            $('#ceiling').on("keypress", function (e) {
+                if (e.which == 13) {
+                    geofs.aircraft.instance.definition.zeroThrustAltitude = parseInt(document.getElementById('ceiling').value);
                 }
             })
-            $('#stealth').on("click", function() {
+            $('#stealth').on("click", function () {
                 //AutoStealthMode Developed by S.H.I.E.L.D. Research & Development
                 if (stealthEnabled) {
                     document.getElementById("stealth").style.backgroundColor = red;
@@ -201,7 +201,7 @@
                     stealthEnabled = true;
                     document.getElementById('stealth').innerHTML = "ENABLED";
                 }
-                multiplayer.sendUpdate = function() {
+                multiplayer.sendUpdate = function () {
                     try {
                         if (!multiplayer.lastRequest && !flight.recorder.playing) {
                             var e = geofs.aircraft.instance,
@@ -272,7 +272,7 @@
             combatmodFrame.show();
             combatmodFrame.htmlElement.parentElement.parentElement.style.zIndex = "204";
             let countersEnabled = false;
-            $("#counterKeys").on("click", function() {
+            $("#counterKeys").on("click", function () {
                 if (countersEnabled) {
                     document.getElementById("counterKeys").style.backgroundColor = red;
                     document.getElementById("counterKeys").innerHTML = "DISABLED";
@@ -286,12 +286,12 @@
                 window.enabled = void 0;
                 $(document).off("keydown");
                 $(document).on("keydown", ".geofs-stopKeyboardPropagation",
-                    function(e) {
+                    function (e) {
                         e.stopImmediatePropagation();
                     }
                 );
                 $(document).on("keydown", ".address-input",
-                    function(e) {
+                    function (e) {
                         e.stopImmediatePropagation();
                     }
                 );
@@ -299,7 +299,7 @@
                 /*Flares*/
                 controls.setters.sayFlares = {
                     label: "Say Flares",
-                    set: function() {
+                    set: function () {
                         multiplayer.chatMessage = "flares";
                     }
                 };
@@ -307,7 +307,7 @@
                 /*Chaff*/
                 controls.setters.sayChaff = {
                     label: "Say Chaff",
-                    set: function() {
+                    set: function () {
                         multiplayer.chatMessage = "chaff";
                     }
                 };
@@ -315,12 +315,12 @@
                 /*Evade*/
                 controls.setters.sayEvade = {
                     label: "Say Evade",
-                    set: function() {
+                    set: function () {
                         multiplayer.chatMessage = "evade";
                     }
                 };
                 var e = controls.keyDown;
-                controls.keyDown = function(o) {
+                controls.keyDown = function (o) {
                     if (countersEnabled) {
                         if (typeof enabled != "undefined") {
                             if (o.which == 50) {
@@ -355,21 +355,21 @@
                         }
                     }
                 }
-                
+
                 enabled = !0;
                 $(document).on("keydown", controls.keyDown);
-                $("#flares").click(function(){
+                $("#flares").click(function () {
                     multiplayer.chatMessage = "flares";
                 });
-                $("#chaff").click(function(){
+                $("#chaff").click(function () {
                     multiplayer.chatMessage = "chaff";
                 });
-                $("#evade").click(function(){
+                $("#evade").click(function () {
                     multiplayer.chatMessage = "evade";
                 });
             });
-            $("#haul").on("click", function(){
-                geofs.aircraft.instance.setup.maxRPM = 1000000;
+            $("#haul").on("click", function () {
+                geofs.aircraft.instance.definition.maxRPM = 1000000;
             });
         }
         function loadMechMod() {
@@ -398,43 +398,43 @@
             document.getElementById("instaflaps").style.backgroundColor = red;
             mechModFrame.show();
             mechModFrame.htmlElement.parentElement.parentElement.style.zIndex = "205";
-            
+
             let gearEnabled = false;
-            let gearTravelTime = geofs.aircraft.instance.setup.gearTravelTime;
-            $("#instagear").on("click", function() {
+            let gearTravelTime = geofs.aircraft.instance.definition.gearTravelTime;
+            $("#instagear").on("click", function () {
                 if (gearEnabled) {
-                    geofs.aircraft.instance.setup.gearTravelTime = gearTravelTime;
+                    geofs.aircraft.instance.definition.gearTravelTime = gearTravelTime;
                     gearEnabled = false;
                     document.getElementById("instagear").style.backgroundColor = red;
                     document.getElementById("instagear").innerHTML = "DISABLED";
                 } else {
-                    gearTravelTime = geofs.aircraft.instance.setup.gearTravelTime;
+                    gearTravelTime = geofs.aircraft.instance.definition.gearTravelTime;
                     gearEnabled = true;
                     document.getElementById("instagear").style.backgroundColor = green;
                     document.getElementById("instagear").innerHTML = "ENABLED";
-                    geofs.aircraft.instance.setup.gearTravelTime = .000000001;
+                    geofs.aircraft.instance.definition.gearTravelTime = .000000001;
                 }
 
 
             });
 
             let flapsEnabled = false;
-            let flapsTravelTime = geofs.aircraft.instance.setup.flapsTravelTime;
-            $("#instaflaps").on("click", function() {
+            let flapsTravelTime = geofs.aircraft.instance.definition.flapsTravelTime;
+            $("#instaflaps").on("click", function () {
                 if (flapsEnabled) {
-                    geofs.aircraft.instance.setup.flapsTravelTime = flapsTravelTime;
+                    geofs.aircraft.instance.definition.flapsTravelTime = flapsTravelTime;
                     flapsEnabled = false;
                     document.getElementById("instaflaps").style.backgroundColor = red;
                     document.getElementById("instaflaps").innerHTML = "DISABLED";
                 } else {
-                    flapsTravelTime = geofs.aircraft.instance.setup.flapsTravelTime;
+                    flapsTravelTime = geofs.aircraft.instance.definition.flapsTravelTime;
                     flapsEnabled = true;
                     document.getElementById("instaflaps").style.backgroundColor = green;
                     document.getElementById("instaflaps").innerHTML = "ENABLED";
-                    geofs.aircraft.instance.setup.flapsTravelTime = .000000001;
+                    geofs.aircraft.instance.definition.flapsTravelTime = .000000001;
                 }
             })
         }
         inject();
-    } 
+    }
 })();
