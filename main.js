@@ -1,11 +1,10 @@
 // ==UserScript==
 // @name         OspreyClient
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      0.3b
 // @description  The one and only hacked client for GeoFS
 // @author       Osprey
-// @match        https://www.geo-fs.com/geofs.php?v=3.3
-// @match        https://legacy.geo-fs.com/geofs.php
+// @match        https://www.geo-fs.com/geofs.php?v=3.9
 // @icon         https://www.google.com/s2/favicons?domain=geo-fs.com
 // @grant        none
 // ==/UserScript==
@@ -157,12 +156,12 @@
                     </div>`
             });
             document.getElementById("stealth").style.backgroundColor = red;
-            document.getElementById('ceiling').value = geofs.aircraft.instance.setup.zeroThrustAltitude;
+            document.getElementById('ceiling').value = geofs.aircraft.instance.definition.zeroThrustAltitude;
             flightmodFrame.show();
             flightmodFrame.htmlElement.parentElement.parentElement.style.zIndex = "203";
             let stealthEnabled = false;
             let speed
-            let maxRPM = geofs.aircraft.instance.setup.maxRPM;
+            let maxRPM = geofs.aircraft.instance.definition.maxRPM;
             let desiredPos = [52.8456078, -.5376166, 179.02169805221382],
                     disguisePos = !1,
                     desiredPlaneId = 4,
@@ -174,18 +173,18 @@
             $("#speedSlider").on("change", function(){
                 speed = document.getElementById("speedSlider").value;
                 document.getElementById("speedBox").value = speed;
-                geofs.aircraft.instance.setup.maxRPM = maxRPM * speed/100;
+                geofs.aircraft.instance.definition.maxRPM = maxRPM * speed/100;
             });
             $('#speedBox').on("keypress", function(e){
                 if(e.which == 13){
                     speed = document.getElementById("speedBox").value;
                     document.getElementById("speedSlider").value = speed;
-                    geofs.aircraft.instance.setup.maxRPM = maxRPM * speed/100;
+                    geofs.aircraft.instance.definition.maxRPM = maxRPM * speed/100;
                 }
             });
             $('#ceiling').on("keypress", function(e) {
                 if(e.which == 13) {
-                    geofs.aircraft.instance.setup.zeroThrustAltitude = parseInt(document.getElementById('ceiling').value);
+                    geofs.aircraft.instance.definition.zeroThrustAltitude = parseInt(document.getElementById('ceiling').value);
                 }
             })
             $('#stealth').on("click", function() {
@@ -369,7 +368,10 @@
                 });
             });
             $("#haul").on("click", function(){
-                geofs.aircraft.instance.setup.maxRPM = 1000000;
+                document.getElementById("haul").style.backgroundColor = green;
+                document.getElementById("haul").innerHTML = "ENABLED";
+                
+                geofs.aircraft.instance.definition.maxRPM = 1000000;
             });
         }
         function loadMechMod() {
@@ -400,38 +402,38 @@
             mechModFrame.htmlElement.parentElement.parentElement.style.zIndex = "205";
             
             let gearEnabled = false;
-            let gearTravelTime = geofs.aircraft.instance.setup.gearTravelTime;
+            let gearTravelTime = geofs.aircraft.instance.definition.gearTravelTime;
             $("#instagear").on("click", function() {
                 if (gearEnabled) {
-                    geofs.aircraft.instance.setup.gearTravelTime = gearTravelTime;
+                    geofs.aircraft.instance.definition.gearTravelTime = gearTravelTime;
                     gearEnabled = false;
                     document.getElementById("instagear").style.backgroundColor = red;
                     document.getElementById("instagear").innerHTML = "DISABLED";
                 } else {
-                    gearTravelTime = geofs.aircraft.instance.setup.gearTravelTime;
+                    gearTravelTime = geofs.aircraft.instance.definition.gearTravelTime;
                     gearEnabled = true;
                     document.getElementById("instagear").style.backgroundColor = green;
                     document.getElementById("instagear").innerHTML = "ENABLED";
-                    geofs.aircraft.instance.setup.gearTravelTime = .000000001;
+                    geofs.aircraft.instance.definition.gearTravelTime = .000000001;
                 }
 
 
             });
 
             let flapsEnabled = false;
-            let flapsTravelTime = geofs.aircraft.instance.setup.flapsTravelTime;
+            let flapsTravelTime = geofs.aircraft.instance.definition.flapsTravelTime;
             $("#instaflaps").on("click", function() {
                 if (flapsEnabled) {
-                    geofs.aircraft.instance.setup.flapsTravelTime = flapsTravelTime;
+                    geofs.aircraft.instance.definition.flapsTravelTime = flapsTravelTime;
                     flapsEnabled = false;
                     document.getElementById("instaflaps").style.backgroundColor = red;
                     document.getElementById("instaflaps").innerHTML = "DISABLED";
                 } else {
-                    flapsTravelTime = geofs.aircraft.instance.setup.flapsTravelTime;
+                    flapsTravelTime = geofs.aircraft.instance.definition.flapsTravelTime;
                     flapsEnabled = true;
                     document.getElementById("instaflaps").style.backgroundColor = green;
                     document.getElementById("instaflaps").innerHTML = "ENABLED";
-                    geofs.aircraft.instance.setup.flapsTravelTime = .000000001;
+                    geofs.aircraft.instance.definition.flapsTravelTime = .000000001;
                 }
             })
         }
